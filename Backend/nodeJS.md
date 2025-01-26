@@ -1,32 +1,24 @@
 # Node js notes
 
-*Globals-*
+- -dirname -> shows the current directory, not always accessible
+- module -> helps to export one js file to another, can also decide which part or function to send commonjs modules.
+- package-> it is a folder which contains a package.json file. (json: javascript object notation).
+	
 
-1. process
-2. -dirname -> shows the current directory, not always accessible
-3. module -> helps to export one js file to another, can also decide which part or function to send
-commonjs modules -
+- two ways of moduling->
+	- Commonjs-> normally .js is commonjs module. if `{"type" : "module"}` present in package.json then .mjs file becomes commonjs. for exporting in cjs->
+		- `module.exports= FlightRepository;`
+		- `module.exports={ flight_service, search_service }`
+	- for importing in cjs->
+		- `const FlightRepository = require('./Repository/FLightRepository');`
+		- `const { }= require('./Service/index')`
 
-you can also pass function instead of this object.
-![title](img/Screenshot%202024-12-21%20172817.png)
+	- Ecmascript js-> inorder to use ecmascript modules, rename file to .mjs instead of .js OR is by adding this in package.json file: `{ "type" : "module" }` , after this .js file becomes ecmascript and .mjs become commonjs. for exporting in this->
+		- `export default FlightRepository;`
+	- to import in ejs->
+		- `import FlightRepository from './Repository/FlightRepository.js';`
 
-two ways->
-1st mtd->you have to extra effort do enable this, in order to import the file it first executes it*
-in naming a file instead of adding .js in the end add .mjs
-*now use code-
-*import searching from './searching.js';console.log(searching);*
-2nd mtd->inorder to use es modules without renaming file to .mjs is by using package.
-package-> it is a folder which contains a package.json file. (json: javascript object notation)
-
-make the folder a package by adding a file package.json in that folder and write above mentioned code.
-
-named export->
-”type” : “module”
-default export->
-
-add first default export then named export->
-
-doing deafult export of whole object-
+- ![title](img/moduling.png)
 
 - console.log(process.argv) -> gives an array
 1st element- using what element youre executing the file
@@ -67,7 +59,7 @@ read and write file-
 
 concept of stream->
 
-project 0-> Telegram Bot
+# Telegram Bot
 
 ```
 *const axios=require('axios');
@@ -99,7 +91,7 @@ bot.launch();*
 
 ```
 
-## CLIENT SERVER ARCHITECTURE
+# CLIENT SERVER ARCHITECTURE
 
 server->
 server can be a hardware or a software. it is a hardware or a computer program that provides a service to another computer program or a different machine
@@ -120,7 +112,7 @@ three ways to send data-
 * request body- it is a separate payload containing key value pairs
 In rest convention, data/msgs are sent apart from URL are sent in JSON
 
-## Setting up http server
+# Setting up http server
 
 - using http module which is inbuilt by node,
 - http module contains a function called as the createServer
@@ -172,7 +164,7 @@ code using expressJS for same->
 
 ```
 
-## RESTfull APIs
+# RESTfull APIs
 
 API to create a blog-
 
@@ -228,7 +220,7 @@ small code for get,post using array as database-
 
 ```
 
-## MVC architecture
+# MVC architecture
 
 model->handles the backend part, includes service, repository, model
 service- handles all the logic needed
@@ -245,6 +237,8 @@ middleware-> are functions that have access to the request, response and next mi
 user->route->middleware->controller->service->repo->service->controller->middleware->route->back to user
 
 ```
+
+# Sequelize
 
 - Sequelize is node.js ORM for mysql, oracle, postgres, sqlite and more helps in changing mysql language to class oriented language
 
