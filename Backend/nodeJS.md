@@ -7,8 +7,9 @@
 3. module -> helps to export one js file to another, can also decide which part or function to send
 commonjs modules -
 
-*you can also pass function instead of this object. eg-module.exports=linearSearch![[Pasted 
-Ecmascript modules-
+you can also pass function instead of this object.
+![title](/img/Screenshot%202024-12-21%20172817.png)
+
 two ways->
 1st mtd->you have to extra effort do enable this, in order to import the file it first executes it*
 in naming a file instead of adding .js in the end add .mjs
