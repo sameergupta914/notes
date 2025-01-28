@@ -20,44 +20,34 @@
 
 - ![title](img/moduling.png)
 
-- console.log(process.argv) -> gives an array
+- `console.log(process.argv);'` -> gives an array
 1st element- using what element youre executing the file
 2nd element- path of the file
 3rd,4th,..- arguments you have passed
-- process.stdout.write(" ");
-will not give a line space unless given
-- package manager in node (npm(node package manager), yarn) - manages the installation of packages, handles its dependencies resolution, version management.
-npx(part of npm)- used to directly executes some function of the installed package from the terminal
-minimist- *node file_path -a X -b Y
+- `process.stdout.write(" ");` -> will not give a line space unless given.
 
-X and Y are your inputs
-axios- helps you to make http call
+- package manager in node (npm(node package manager), yarn) -> manages the installation of packages handles its dependencies resolution, version management.
 
-now default packages-
+- npx(part of npm) -> used to directly executes some function of the installed package from the terminal
+minimist- `node file_path -a X -b Y` , X and Y are your inputs
 
-fs- const fs=require("fs");
-in es6 (--dirname) cant be used to get file path instead this is used- import.meta.url
-to read file from index.html eg-
+- axios- helps you to make http call
+
+- fs- `const fs=require("fs");`
+- in es6 `--dirname` cant be used to get file path instead this is used `import.meta.url`
+
+- to read file from index.html-> 
+```
 import {readFile} from 'fs/promises';
 const filePath=new URL('./index.html', import.meta.url);
 const data= await readFile(filePath, {encoding: 'utf8' });
-console.log(data);
+console.log(data); 
+```	
 
-to write file in index.html eg-
+- `npm init` -> to initialize basic node project, to create a basic node file or to create package.json file type in terminal, json file is created containing these metadata.
 
-*npm init* - to initialize basic node project, to create a basic node file or to create package.json file type in terminal-
-
-```
-a json file is created containing these metadata.
-
-installing some dependencies like axios (npm i axios), a package-lock.json file is created which ensures that it contains the same version of all packages and their dependencies when used in different enviroment.
-we don't upload node_modules file on GitHub so package-lock.json helps in ensuring we are using same version of all stuffs
-
-```
-
-read and write file-
-
-concept of stream->
+- installing some dependencies like axios `npm i axios`, a package-lock.json file is created which ensures that it contains the same version of all packages and their dependencies when used in different enviroment.
+- we don't upload node_modules file on GitHub so package-lock.json helps in ensuring we are using same version of all stuffs
 
 # Telegram Bot
 
@@ -93,37 +83,44 @@ bot.launch();*
 
 # CLIENT SERVER ARCHITECTURE
 
-server->
-server can be a hardware or a software. it is a hardware or a computer program that provides a service to another computer program or a different machine
-API contracts- REST, JRPC, SOAP, etc
-REST- representational state transfer, this is just a set of rules-
-* every real life entity is expected to be represented as a resource.
-* every time with a RESTfull api request we have to sent type/methods of the request.
-* there will be dedicated URLs.
-GET- retrieve info about a resource, data is sent in URL, that means it gets saved in out history, we can log it cache it etc
-POST- create side effects on a resource, data is not expectedto be sent in URL, rather there is a request body/payload.
-PUT- make complete update to a resource,
-PATCH- make partial update to a resource,
-DELETE- delete a resource
-these are according to rest convention
-three ways to send data-
-* request param- in this we send unique identifier of a resource, eg: /movies/lifeofpi
-* query param- along with unique identifier we send key value pairs with it, eg : /categories/electronics?company=samsung&order=desc
-* request body- it is a separate payload containing key value pairs
-In rest convention, data/msgs are sent apart from URL are sent in JSON
+Server->
+- server can be a hardware or a software. it is a hardware or a computer program that provides a service to another computer program or a different machine.
 
-# Setting up http server
+- API contracts- REST, JRPC, SOAP, etc
 
-- using http module which is inbuilt by node,
-- http module contains a function called as the createServer
-- this createServer function takes a callback as the input
-- now inside the callback we get 2 arguments
-request- this argument contains all the details about the incoming req
-response- this argument contains functions using which we can prepare the response
+- REST-> representational state transfer, this is just a set of rules-
+	- every real life entity is expected to be represented as a resource.
+	- every time with a RESTfull api request we have to sent type/methods of the request.
+	- there will be dedicated URLs.
+
+- GET-> retrieve info about a resource, data is sent in URL, that means it gets saved in out history, we can log it cache it etc
+
+- POST-> create side effects on a resource, data is not expectedto be sent in URL, rather there is a request body/payload.
+
+- PUT-> make complete update to a resource,
+
+- PATCH-> make partial update to a resource,
+
+- DELETE-> delete a resource
+
+- three ways to send data-
+	- request param- in this we send unique identifier of a resource, eg: /movies/lifeofpi
+	- query param- along with unique identifier we send key value pairs with it, eg : /categories electronics?company=samsung&order=desc
+	- request body- it is a separate payload containing key value pairs
+
+- In rest convention, data/msgs are sent apart from URL are sent in JSON
+
+# SETTING UP HTTP SERVER
+
+- using http module which is inbuilt by node, http module contains a function called as the `createServer`
+- this createServer function takes a callback as the input, now inside the callback we get 2 arguments
+	- request-> this argument contains all the details about the incoming req
+	- response-> this argument contains functions using which we can prepare the response.
+
 - the createServer function returns us the server object
-- port- request will identify the IP address but multiple processes may be running on that IP, so port help in deciding which process to go to.
+- port-> request will identify the IP address but multiple processes may be running on that IP, so port help in deciding which process to go to.
 
-code for starting server using node only with the help of http inbuilt module->
+- code for starting server using node only with the help of http inbuilt module->
 
 ```
 const http=require('http');
@@ -174,11 +171,12 @@ API to delete blog-
 
 API to update a blog-
 
-after updating your code in the server, you can automatically re-run your code using - npx nodemon index.js                 (npm i nodemon) <-to download it
-or to simplify it go to your package.json file and add "start" : "npx nodemon index.js" in the scripts section,
-now you can simply re-run using code- npm start
+- NODEMON->
+	- after updating your code in the server, you can automatically re-run your code using -> `npx nodemon index.js` , to download it-> `npm i nodemon`
 
-small code for get,post using array as database-
+	- or go to your `package.json` file and add `"start" : "npx nodemon index.js"` in the scripts section, now you can simply re-run using code-> `npm start`
+
+- small code for get,post using array as database-
 
 ```
 	const bodyParser=require('body-Parser');
@@ -216,22 +214,18 @@ small code for get,post using array as database-
 
 ```
 
-```
-
-```
 
 # MVC architecture
 
-model->handles the backend part, includes service, repository, model
-service- handles all the logic needed
-repository- handles all the connection or calls the database
-model-> decides one line of the database table, decide structure of database
+- model->handles the backend part, includes service, repository, model
+- service-> handles all the logic needed
+- repository-> handles all the connection or calls the database
 
-view->handles or includes the frontend portion which is viewed by the user
+- model-> decides one line of the database table, decide structure of database
+- view->handles or includes the frontend portion which is viewed by the user
+- controllers->passed calls made from user on views to model portion
 
-controllers->passed calls made from user on views to model portion
-
-middleware-> are functions that have access to the request, response and next middleware function in the application's req-res cycle
+- middleware-> are functions that have access to the request, response and next middleware function in the application's req-res cycle
 
 ```
 user->route->middleware->controller->service->repo->service->controller->middleware->route->back to user
