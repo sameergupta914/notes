@@ -93,9 +93,9 @@ JSON
 `select * from actors order by charges desc, name desc;`
 
 - limit and offset
-- get limited no. of data use limit
-- define the starting point from which we have to fetch the data use offset
-`select * from actors order by charges desc LIMIT 2 OFFSET 1;
+    - get limited no. of data use limit
+    - define the starting point from which we have to fetch the data use offset
+    `select * from actors order by charges desc LIMIT 2 OFFSET 1;
 
 - update table
 `update actors set name="jennifer laurence" where name="tara sutaria";`

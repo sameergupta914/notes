@@ -1,7 +1,6 @@
-# projects
 
-- color changer project 1->
-    
+# color changer project 1
+```javascript    
     const buttons = document.querySelectorAll('.button');
     const body = document.querySelector('body');
     
@@ -22,17 +21,13 @@
     if ([e.target.id](http://e.target.id/) === 'yellow') {
     body.style.backgroundColor = [e.target.id](http://e.target.id/);
     }
-    
-    ```
+    });    
     });
-    
-    ```
-    
-    });
-    
+```    
 
-==bmi calculator project 2->==
+# bmi calculator project 2
 
+```javascript
 const form = document.querySelector('form');
 // this usecase will give you empty
 // const height = parseInt(document.querySelector('#height').value)
@@ -54,8 +49,11 @@ const bmi = (weight / ((height * height) / 10000)).toFixed(2);
 results.innerHTML = `<span>${bmi}</span>`;
 }
 });
+```
 
-==local clock project 3->==
+#local clock project 3
+
+```javascript
 const clock = document.getElementById('clock');
 // const clock = document.querySelector('#clock')
 
@@ -64,9 +62,12 @@ let date = new Date();
 // console.log(date.toLocaleTimeString());
 clock.innerHTML = date.toLocaleTimeString();
 }, 1000);
+```
 
-==guess the number project 4, used method of binary sort->==
 
+# guess the number project 4, used method of binary sort
+
+```javascript
 let randomNumber = parseInt(Math.random() * 100 + 1);
 
 const submit = document.querySelector('#subt');
@@ -154,17 +155,14 @@ guessSlot.innerHTML = '';
 remaining.innerHTML = `${11 - numGuess}` ;
 userInput.removeAttribute('disabled');
 startOver.removeChild(p);
-
-```
 playGame = true;
-
-```
 
 });
 }
-
+```
 # Events
 
+```javascript
 document.getElementById('owl').onclick = function(){
 alert("owl clicked")
 }
@@ -202,10 +200,13 @@ removeIt.remove()
 })
 
 removeIt.parentNode.removeChild(removeIt)
+```
 
 # classes and oops
 
-- ==objects->==
+- objects->
+
+```javascript
 function multipleBy5(num){
     
     ```
@@ -234,8 +235,7 @@ function multipleBy5(num){
       const tea = createUser("tea", 250)
     
       chai.printMe()
-    
-      /*
+    ```
     
       Here's what happens behind the scenes when the new keyword is used:
     
@@ -246,7 +246,3 @@ function multipleBy5(num){
       The constructor is called: The constructor function is called with the specified arguments and this is bound to the newly created object. If no explicit return value is specified from the constructor, JavaScript assumes this, the newly created object, to be the intended return value.
     
       The new object is returned: After the constructor function has been called, if it doesn't return a non-primitive value (object, array, function, etc.), the newly created object is returned.
-    
-      */
-    
-    ```
