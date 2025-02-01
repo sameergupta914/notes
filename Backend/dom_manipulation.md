@@ -1,25 +1,33 @@
 # DOM
 
-- to get something from the html document, for eg we want to get all the links from docs -> console.log(document.link)
-- to access somthing by their id -> document.==getElementById==(' '), by class_name-> x.==getElementByClassName==(' ')
-- to manipulate something with their id -> document.==getElementById('').innerHTML===""
-- x.getElementById('id_name').==getAttribute==('attribute') ->attribute can be id or class or etc =>o/p is attribute_name
-- setAttribute to change any attribute->eg- x.setAttribute('attribute', 'attribute_name')
-- ==id_name.innerText, id_name.innerContent, id_name.innerHTML== ->
-innertext gives the visible text and innercontent gives thewhole texts, visible and not visible both.
-- ==querySelector==
-x.querySelector('h2')
-x.querySelector(#id_name)
-x.querySelector(.class_name)
-('input[type="password")'
+- to get something from the html document, for eg we want to get all the links from docs -> `console.log(document.link);`
+
+- to access something by their id -> `document.getElementById(' ')`,
+- by class_name-> `x.getElementByClassName(' ')`
+
+- to manipulate something with their id -> `document.getElementById('').innerHTML`
+- `x.getElementById('id_name').getAttribute('attribute')` -> attribute can be id or class or etc =>o/p is attribute_name
+
+- setAttribute to change any attribute-> `x.setAttribute('attribute', 'attribute_name')`
+
+- `id_name.innerText` , `id_name.innerContent` , `id_name.innerHTML` -> innertext gives the visible text and innercontent gives thewhole texts, visible and not visible both.
+
+# querySelector
+
+`x.querySelector('h2')`
+`x.querySelector(#id_name)`
+`x.querySelector(.class_name)`
+
+('input[type="password"]')
 ('p : first-child')
-x.querySelector('ul')
-const myul=x.querySelector('ul')
-myul.querySelector('li')
-const turng=myul.querySelector('li')
-turng.syle.backgroundColor="green"
+`x.querySelector('ul')`
+
+- `const myul=x.querySelector('ul'); myul.querySelector('li')`
+
+`const turng=myul.querySelector('li'); turng.syle.backgroundColor="green"`
+
 x.querySelectorAll('li') ->array jaisa dikhta hai
-- ==nodelist and HTML collection== are similar to array not not exactly same.
+- nodelist and HTML collection are similar to array not not exactly same.
     - converting HTML collection to array->
     x.getElementsByClassName('list-item')
     const y=x.getElementsByClassName('list-item')
