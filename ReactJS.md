@@ -16,4 +16,11 @@
     - in js file, create a function which is called component, and return a javascript xml file. and export the component. 
     - where we have to use that component, import it.
 
-`{props.children}` -> to make visible inside of tag
+- `{props.children}` -> to make visible inside of tag
+- props ->
+
+- onClick -> this hook take function as input. eg- `<button className='btn' onClick={clickHandler}>` , `function clickHandler(){ console.log('trying onclick hook'); }`
+
+- `useState(<initializingvalue>)` ->this hook returns array containing 2 value, value of variable and a function which returns the changed value. eg-> `let [name, setName]=useState(props.name)` , `setName('gupta');`
+
+- to change multiple, `const [fullProductInput, setfullProductInput]= useState({ title:'', date:'' });` , `function setfullProductInput(){  }`
