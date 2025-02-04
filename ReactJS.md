@@ -1,0 +1,19 @@
+# ReactJS
+
+- React is a javascript library. it is all about component
+- Its easy to create UI in reactjs as compare to simple javascript.
+- It follows declarative approach which means you have to provide only the end state and rest react manages itself.
+- It uses SPA approach, meaning it is based on single page application apporach
+
+- To create react app->
+    `npx create-react-app <appname>`
+   ` cd <appname>`
+   ` npm start`
+
+- To create a component->
+    - create a js file and css file, keep first letter of word capital in the name of both files and link css into js file. eg:
+        `ItemDate.js`, `ItemDate.css` , to link css into js-> `import './ItemDate.css';`
+    - in js file, create a function which is called component, and return a javascript xml file. and export the component. 
+    - where we have to use that component, import it.
+
+`{props.children}` -> to make visible inside of tag
