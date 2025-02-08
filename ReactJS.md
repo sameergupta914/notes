@@ -99,3 +99,43 @@
     ```
 - If you use useState hook with an API call then if passing `null` as intial value in useState hook then it can show error while fetching so to avoid that use spinner logic or else pass `[]` instead of null. eg: `const [courses, setCourses]=useState([]);`
 
+- Controlled components: `value='formData.firstName'`, eg:
+    <input type='text' placeholder='first name' onChange={changeHandler} name='firstName' value={formData.firstName}/>
+
+- Form:
+    - to use useState for multiple variables:
+        ``` 
+        const [formData, setFormData]=useState({
+            firstName:'', 
+            lastName:'',
+            commentbox:false,
+            candidates:false,
+            offers:false,
+            samemode:'',
+            country:''
+        });
+        
+        function changeHandler(event){
+            const {name, value, checked, type}= event.target
+            setFormData(prevData=>{
+                return {
+                ...prevData,
+                [name]: type==='checkbox' ? checked : value
+                }
+            });
+        } ```
+
+- On clicking submit button an automatic onSubmit hooks occurs.
+
+- Checkbox:  on using htmlFor tag it should match with name tag & id tag. eg: ```
+        <input type='checkbox' onChange={changeHandler} name='commentbox' id='commentbox' checked={formData.commentbox}/>
+        <label htmlFor='commentbox'>Comments </label>  ```
+
+- Radio: to select either one option they all have same name tag. eg:
+```
+        <input type='radio' onChange={changeHandler} name='samemode' value='everything' id='everything' checked={formData.samemode==='everything'}/>
+        <label htmlFor='everything'>Everything</label>
+
+        <input type='radio' onChange={changeHandler} name='samemode' value='email' id='email' checked={formData.samemode==='email'}/>
+        <label htmlFor='email'>Same as Email</label> ```
+
