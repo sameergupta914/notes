@@ -125,17 +125,17 @@
             });
         } ```
 
-- On clicking submit button an automatic onSubmit hooks occurs.
+    - On clicking submit button an automatic onSubmit hooks occurs.
 
-- Checkbox:  on using htmlFor tag it should match with name tag & id tag. eg: ```
-        <input type='checkbox' onChange={changeHandler} name='commentbox' id='commentbox' checked={formData.commentbox}/>
-        <label htmlFor='commentbox'>Comments </label>  ```
+    - Checkbox:  on using htmlFor tag it should match with name tag & id tag. eg: ```
+            <input type='checkbox' onChange={changeHandler} name='commentbox' id='commentbox' checked={formData.commentbox}/>
+            <label htmlFor='commentbox'>Comments </label>  ```
 
-- Radio: to select either one option they all have same name tag. eg:
-```
-        <input type='radio' onChange={changeHandler} name='samemode' value='everything' id='everything' checked={formData.samemode==='everything'}/>
-        <label htmlFor='everything'>Everything</label>
+    - Radio: to select either one option they all have same name tag. eg:
+    ```
+            <input type='radio' onChange={changeHandler} name='samemode' value='everything' id='everything' checked={formData.samemode==='everything'}/>
+            <label htmlFor='everything'>Everything</label>
 
-        <input type='radio' onChange={changeHandler} name='samemode' value='email' id='email' checked={formData.samemode==='email'}/>
-        <label htmlFor='email'>Same as Email</label> ```
+            <input type='radio' onChange={changeHandler} name='samemode' value='email' id='email' checked={formData.samemode==='email'}/>
+            <label htmlFor='email'>Same as Email</label> ```
 
