@@ -9,6 +9,7 @@
     `npx create-react-app <appname>`
    ` cd <appname>`
    ` npm start`
+- if a error come related to code not found use `npm install --save-dev ajv@^7`
 
 - To create a component->
     - create a js file and css file, keep first letter of word capital in the name of both files and link css into js file. eg:
@@ -19,15 +20,16 @@
 - `{props.children}` -> to make visible inside of tag
 - props ->
 
-- onClick -> this hook take function as input. eg- `<button className='btn' onClick={clickHandler}>` , `function clickHandler(){ console.log('trying onclick hook'); }`
+- onClick -> this hook take function as input. eg: `<button className='btn' onClick={clickHandler}>` , `function clickHandler(){ console.log('trying onclick hook'); }`
+- onChange -> comes in action as soon as there is any change in the input.
 
 - Parent contacting child->
-    - `useState(<initializingvalue>)` ->this hook returns array containing 2 value, value of variable and a function which returns the changed value. eg-> `let [name, setName]=useState(props.name)` , `setName('gupta');`
+    - useState hook -> `useState(<initializingvalue>)` ->this hook returns array containing 2 value, value of variable and a function which returns the changed value. eg: `let [name, setName]=useState(props.name)` , `setName('gupta');`
 
     - to use useState for multiple, `const [fullProductInput, setfullProductInput]= useState({ title:'', date:'' });` , `function setfullProductInput(){  }`
 
 - Child contacting parent->
-    - create a function and pass it to the child and child will return the obj as argument. eg->
+    - create a function and pass it to the child and child will return the obj as argument. eg:
         in app.js
         ```javascript
          function tryingchild(data){
@@ -56,4 +58,44 @@
 - `event.target.value` -> gives the value from event occuring
 - `event.preventDefault()` -> prevents default behaviour
 - `<input type='text' value={newName}>` -> value tag links the newName to the value of input.
-- 
+- Whenever using map to list elements always use key tag. eg: `key={data.id}` 
+
+- useEffect hook -> it manages side effects like making an api call, change in the document title, modifying browsers history etc. [agar aap koi task karwana chahte ho component ke render hone ke baad, uss task ko hm iss hook ke andr define karte hain aur usko hi side effects kehte hain]. contains 2 parts, callback function and array of dependencies.
+    - var1(every render): it executes after every rendering. eg: `useEffect(()=>{ console.log( 'UI rendering done' )});`
+    - var2(first render): only after first rendering. eg: `useEffect(()=>{ console.log( 'UI rendering done' )}, []);`
+    - var3(whenever dependency changes + first render): eg: `useEffect(()=>{ console.log( 'UI rendering done' )}, [text]);`
+    - var4(first remove listener then add listener): eg: `useEffect(()=>{ console.log('listener added') return ()=>{ console.log('listener removed) }}, [text]);`
+
+- React Toast: 
+    `npm i react-toastify`
+    `import { ToastContainer } from 'react-toastify';`
+    `import "react-toastify/dist/ReactToastify.css";`
+
+    - in index.js file:
+        ```javascript
+        <div>
+        <App />
+        <ToastContainer/>
+        </div>
+        ```
+    - Where you have to use: `import { toast } from "react-toastify";`, 
+    - use these:  
+        `toast.warning('Like Removed');`
+        `toast.success('Liked Successfully');`
+        `toast.error('something went wrong');`
+        
+
+
+
+- To fetch an API call,eg:  `import { apiUrl } from './data';`
+                            `let res= await fetch(apiUrl);`
+                            `let output=await res.json();`
+
+- In map function if you use {} then you have to return and if use () then without return. eg:
+    ```javascript
+    getCourses().map((course)=>(
+                 <Card key={course.id}/>
+            ))
+    ```
+- If you use useState hook with an API call then if passing `null` as intial value in useState hook then it can show error while fetching so to avoid that use spinner logic or else pass `[]` instead of null. eg: `const [courses, setCourses]=useState([]);`
+
