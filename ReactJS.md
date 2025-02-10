@@ -83,6 +83,10 @@
         `toast.warning('Like Removed');`
         `toast.success('Liked Successfully');`
         `toast.error('something went wrong');`
+
+- `npm i react-hot-toast`
+- `import toast from "react-hot-toast";`
+- in index.js file: `import { Toaster } from 'react-hot-toast';` `<Toaster/>`
         
 
 
@@ -102,7 +106,7 @@
 - Controlled components: `value='formData.firstName'`, eg:
     <input type='text' placeholder='first name' onChange={changeHandler} name='firstName' value={formData.firstName}/>
 
-- Form:
+# Form
     - to use useState for multiple variables:
         ``` 
         const [formData, setFormData]=useState({
@@ -139,3 +143,31 @@
             <input type='radio' onChange={changeHandler} name='samemode' value='email' id='email' checked={formData.samemode==='email'}/>
             <label htmlFor='email'>Same as Email</label> ```
 
+# React Router
+
+- `npm i react-router-dom` -> to install router
+    - `import { BrowserRouter } from 'react-router-dom';` 
+    - `<BrowserRouter> <App /> </BrowserRouter>` -> in index.js
+
+- navigate between multiple pages without refreshing the page.
+
+- `<Routes></Routes>` -> used to create multiple Routes
+- `import { Route, Routes } from 'react-router-dom';` -> to import.
+- `<Route path='/' element={<component/>}></Route>` -> single route
+    - `<Outlet/>` -> allows appear of its children
+    - `<Route index element={<component/>}` -> as a index
+    - `<Route path='*' element={<NotFound/>}/>` ->if anyother besides given routes
+
+- useNavigate hook: to navigate from one page to anyother
+    - `import { useNavigate } from "react-router-dom";` 
+        `const navi=useNavigate();`
+    - `navi('/');` -> to navigate to '/'.
+    - `navi(-1);` -> to navigate to previous page.
+- navigate hook: `<navigate to='/'>`
+
+- Link: `<Link to='#'> <p className="forgot">Forgot Password</p> </Link>` -> # stay on same page.
+- NavLink: same as link but add `classname='active'` in the link.
+
+
+
+- extra: `import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";`
