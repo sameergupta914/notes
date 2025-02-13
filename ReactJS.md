@@ -179,54 +179,53 @@
 - to consume: `const { }= useContext(AppContext);`
 
 # useLocation hook:
-    -  The useLocation hook in React Router is used to access the current URL location object. This is useful for getting the pathname, search parameters, or state passed between pages.
-    - The location object contains:
-        - pathname → The current URL path (/home, /dashboard, etc.)
-        - search → Query parameters (?id=123&name=John)
-        - hash → The URL fragment (#section1)
-        - state → Data passed via useNavigate or <Link>
-    - syntax:
-        `import { useLocation } from 'react-router-dom';`
-       ` const location=useLocation();  `
-    - use:
-        ` if(location.pathname.includes('tags')){ const tag= location.pathname.split('/').at(-1).replaceAll('-', ' ');  ` 
-    - eg:
-       ``` import { useLocation } from "react-router-dom";
-
+-  The useLocation hook in React Router is used to access the current URL location object. This is useful for getting the pathname, search parameters, or state passed between pages.
+- The location object contains:
+    - pathname → The current URL path (/home, /dashboard, etc.)
+    - search → Query parameters (?id=123&name=John)
+    - hash → The URL fragment (#section1)
+    - state → Data passed via useNavigate or <Link>
+- syntax:
+    `import { useLocation } from 'react-router-dom';`
+    ` const location=useLocation();  `
+- use:
+     ` if(location.pathname.includes('tags')){ const tag= location.pathname.split('/').at(-1).replaceAll('-', ' ');  ` 
+- eg:
+    ```
+     import { useLocation } from "react-router-dom";
         function LocationExample() {
-        const location = useLocation();
-        
+        const location = useLocation(); 
         return (
-            <div>
+          <div>
             <p>Pathname: {location.pathname}</p>
             <p>Search: {location.search}</p>
             <p>Hash: {location.hash}</p>
             </div>
         );
         }```
-    - If the URL is http://localhost:3000/profile?id=42#section1,
-    - Output:
+
+- If the URL is http://localhost:3000/profile?id=42#section1,
+- Output:
         Pathname: /profile
         Search: ?id=42
         Hash: #section1
 
 
 # useSearchParams hook: 
-    - The useSearchParams hook is used to read and modify query parameters in the URL without affecting the component's state.
-    - useSearchParams returns:
-        - searchParams → An instance of URLSearchParams to read query parameters.
-        - setSearchParams → A function to update query parameters.
-    - syntax:
-       ` import { Route, Routes, useLocation, useSearchParams } from 'react-router-dom';`
-        `const [searchParams, setSearchParams]= useSearchParams();`
-    - use:
-       ` const page=searchParams.get('page') ?? 1;`
-    - eg:
-    ```import { useSearchParams } from "react-router-dom";
-
+- The useSearchParams hook is used to read and modify query parameters in the URL without affecting the component's state.
+- useSearchParams returns:
+     - searchParams → An instance of URLSearchParams to read query parameters.
+     - setSearchParams → A function to update query parameters.
+- syntax:
+     ` import { Route, Routes, useLocation, useSearchParams } from 'react-router-dom';`
+     `const [searchParams, setSearchParams]= useSearchParams();`
+- use:
+    ` const page=searchParams.get('page') ?? 1;`
+- eg:
+    ```
+    import { useSearchParams } from "react-router-dom";
         function SearchParamsExample() {
         const [searchParams, setSearchParams] = useSearchParams();
-        
         return (
             <div>
             <p>Query ID: {searchParams.get("id")}</p>
@@ -235,7 +234,9 @@
             </button>
             </div>
         );
-        }```
-    - If the URL is http://localhost:3000/profile?id=42,
-    - Output: Query ID: 42
+        }
+        ```
+        
+- If the URL is http://localhost:3000/profile?id=42,
+- Output: Query ID: 42
 
