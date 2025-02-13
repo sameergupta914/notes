@@ -107,7 +107,7 @@
     <input type='text' placeholder='first name' onChange={changeHandler} name='firstName' value={formData.firstName}/>
 
 # Form
-    - to use useState for multiple variables:
+- to use useState for multiple variables:
         ``` 
         const [formData, setFormData]=useState({
             firstName:'', 
@@ -129,13 +129,13 @@
             });
         } ```
 
-    - On clicking submit button an automatic onSubmit hooks occurs.
+- On clicking submit button an automatic onSubmit hooks occurs.
 
-    - Checkbox:  on using htmlFor tag it should match with name tag & id tag. eg: ```
+- Checkbox:  on using htmlFor tag it should match with name tag & id tag. eg: ```
             <input type='checkbox' onChange={changeHandler} name='commentbox' id='commentbox' checked={formData.commentbox}/>
             <label htmlFor='commentbox'>Comments </label>  ```
 
-    - Radio: to select either one option they all have same name tag. eg:
+- Radio: to select either one option they all have same name tag. eg:
     ```
             <input type='radio' onChange={changeHandler} name='samemode' value='everything' id='everything' checked={formData.samemode==='everything'}/>
             <label htmlFor='everything'>Everything</label>
@@ -236,7 +236,7 @@
         );
         }
         ```
-        
+
 - If the URL is http://localhost:3000/profile?id=42,
 - Output: Query ID: 42
 
