@@ -23,12 +23,12 @@
 - onClick -> this hook take function as input. eg: `<button className='btn' onClick={clickHandler}>` , `function clickHandler(){ console.log('trying onclick hook'); }`
 - onChange -> comes in action as soon as there is any change in the input.
 
-- Parent contacting child->
+- Prop Drilling (Parent contacting child)->
     - useState hook -> `useState(<initializingvalue>)` ->this hook returns array containing 2 value, value of variable and a function which returns the changed value. eg: `let [name, setName]=useState(props.name)` , `setName('gupta');`
 
     - to use useState for multiple, `const [fullProductInput, setfullProductInput]= useState({ title:'', date:'' });` , `function setfullProductInput(){  }`
 
-- Child contacting parent->
+- State Lifting (Child contacting parent)->
     - create a function and pass it to the child and child will return the obj as argument. eg:
         in app.js
         ```javascript
@@ -168,6 +168,74 @@
 - Link: `<Link to='#'> <p className="forgot">Forgot Password</p> </Link>` -> # stay on same page.
 - NavLink: same as link but add `classname='active'` in the link.
 
-
-
 - extra: `import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";`
+
+# Context API
+
+- step 1: `export const AppContext= createContext();`
+- step 2: `export default function AppContextProvider({children}) { return <AppContext.Provider value={value}> {children} </AppContext.Provider>; }`
+- step 3: `const value ={ };`
+- in index.js: `<AppContextProvider> </App.js> </AppContextProvider>`
+- to consume: `const { }= useContext(AppContext);`
+
+# useLocation hook:
+    -  The useLocation hook in React Router is used to access the current URL location object. This is useful for getting the pathname, search parameters, or state passed between pages.
+    - The location object contains:
+        - pathname → The current URL path (/home, /dashboard, etc.)
+        - search → Query parameters (?id=123&name=John)
+        - hash → The URL fragment (#section1)
+        - state → Data passed via useNavigate or <Link>
+    - syntax:
+        `import { useLocation } from 'react-router-dom';`
+       ` const location=useLocation();  `
+    - use:
+        ` if(location.pathname.includes('tags')){ const tag= location.pathname.split('/').at(-1).replaceAll('-', ' ');  ` 
+    - eg:
+       ``` import { useLocation } from "react-router-dom";
+
+        function LocationExample() {
+        const location = useLocation();
+        
+        return (
+            <div>
+            <p>Pathname: {location.pathname}</p>
+            <p>Search: {location.search}</p>
+            <p>Hash: {location.hash}</p>
+            </div>
+        );
+        }```
+    - If the URL is http://localhost:3000/profile?id=42#section1,
+    - Output:
+        Pathname: /profile
+        Search: ?id=42
+        Hash: #section1
+
+
+# useSearchParams hook: 
+    - The useSearchParams hook is used to read and modify query parameters in the URL without affecting the component's state.
+    - useSearchParams returns:
+        - searchParams → An instance of URLSearchParams to read query parameters.
+        - setSearchParams → A function to update query parameters.
+    - syntax:
+       ` import { Route, Routes, useLocation, useSearchParams } from 'react-router-dom';`
+        `const [searchParams, setSearchParams]= useSearchParams();`
+    - use:
+       ` const page=searchParams.get('page') ?? 1;`
+    - eg:
+    ```import { useSearchParams } from "react-router-dom";
+
+        function SearchParamsExample() {
+        const [searchParams, setSearchParams] = useSearchParams();
+        
+        return (
+            <div>
+            <p>Query ID: {searchParams.get("id")}</p>
+            <button onClick={() => setSearchParams({ id: "123" })}>
+                Change Query ID
+            </button>
+            </div>
+        );
+        }```
+    - If the URL is http://localhost:3000/profile?id=42,
+    - Output: Query ID: 42
+
