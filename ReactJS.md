@@ -67,11 +67,10 @@
     - var4(first remove listener then add listener): eg: `useEffect(()=>{ console.log('listener added') return ()=>{ console.log('listener removed) }}, [text]);`
 
 - React Toast: 
-    `npm i react-toastify`
-    `import { ToastContainer } from 'react-toastify';`
-    `import "react-toastify/dist/ReactToastify.css";`
-
+    - `npm i react-toastify` ->to install
     - in index.js file:
+    -  `import { ToastContainer } from 'react-toastify';`
+    -  `import "react-toastify/dist/ReactToastify.css";`
         ```javascript
         <div>
         <App />
@@ -79,15 +78,14 @@
         </div>
         ```
     - Where you have to use: `import { toast } from "react-toastify";`, 
-    - use these:  
+    - use like these:  
         `toast.warning('Like Removed');`
         `toast.success('Liked Successfully');`
         `toast.error('something went wrong');`
 
-- `npm i react-hot-toast`
-- `import toast from "react-hot-toast";`
-- in index.js file: `import { Toaster } from 'react-hot-toast';` `<Toaster/>`
-        
+    - `npm i react-hot-toast`
+    - in index.js file: `import { Toaster } from 'react-hot-toast';`, ` <App /> <Toaster/>`
+    - where you have to use: - `import toast from "react-hot-toast";`
 
 
 
@@ -240,3 +238,62 @@
 - If the URL is http://localhost:3000/profile?id=42,
 - Output: Query ID: 42
 
+# Redux
+
+- `npm install @reduxjs/toolkit react-redux` -> to install.
+
+- Slice template eg:
+    ```
+    import { createSlice } from '@reduxjs/toolkit'
+
+    export const CartSlice = createSlice({
+    name: 'cart',
+    initialState:[],
+    reducers: {
+        add: (state, action) => {
+        state.push(action.payload);
+        },
+        remove: (state, action) => {
+        return state.filter((item)=>item.id !== action.payload);
+        },
+    },
+    })
+
+    export const { add, remove} = CartSlice.actions
+    export default CartSlice.reducer
+    ```
+    - action.payload: action.payload jo input me send kr rhe hain usko show krta hain
+    - State: state current conditon to show kr rha hain
+
+- Store: The store is a central place where the entire state of your application lives. It holds the data and serves as the single source of truth for your app's state. store template:
+    ```
+    import { configureStore } from '@reduxjs/toolkit'
+    import  CartSlice  from './slices/CartSlice'
+    // import CartReducer from './slices/CartSlice';
+
+    export const store = configureStore({
+    reducer: {
+        cart: CartSlice,
+
+        },
+    })   ```
+
+- Dispatch: Dispatch is a function that allows you to send actions to the Redux store to trigger state changes. When an action is dispatched, the reducers evaluate the action and return a new state.
+
+- useDispatch: The primary purpose of useDispatch is to dispatch actions to the Redux store.It gives you access to the dispatch function, allowing you to trigger changes to the state by sending actions to the store. `const dispatch=useDispatch();`. 
+- eg:
+    ```
+    const dispatch=useDispatch();
+
+    const addToCart=()=>{
+        dispatch(add(post));
+        toast.success('Item added to Cart');
+    }
+    const removeFromCart=()=>{
+        dispatch(remove(post.id));
+        toast.error('Item removed from Cart');
+    }  ```
+
+- useSelector : The primary purpose of useSelector is to read data from the Redux store. It allows your component to access and subscribe to specific pieces of the Redux state. When the state your component depends on changes, useSelector will trigger a re-render. 
+    - syntax template:
+    `import { useSelector } from "react-redux"`,  `const {cart}=useSelector((state)=>state);`
