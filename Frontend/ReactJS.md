@@ -31,29 +31,29 @@
 # State Lifting (Child contacting parent)->
 - create a function and pass it to the child and child will return the obj as argument. eg:
 - in app.js
-     ```javascript
+    ```
          function tryingchild(data){
             console.log('inside app.js');
             console.log(data);
          }
          <NewProduct contacting={tryingchild} />
-        ```
+    ```
 - in NewProduct.js
-        ```javascript
+    ```
         function grandchild(data){
              console.log('inside newproduct.js');
              props.contacting(data);
         }
         <ProductForm finall={grandchild} />
-        ```
+    ```
 - in ProductForm.js
-        ```javascript
+    ```
         const data={
             name:newName,
             date:newDate
         } 
         props.finall(data);
-        ```
+    ```
 
 - `event.target.value` -> gives the value from event occuring
 - `event.preventDefault()` -> prevents default behaviour
