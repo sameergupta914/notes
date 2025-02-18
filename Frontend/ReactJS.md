@@ -24,21 +24,21 @@
 - onChange -> comes in action as soon as there is any change in the input.
 
 # Prop Drilling (Parent contacting child), useState hook
-    - useState hook -> `useState(<initializingvalue>)` ->this hook returns array containing 2 value, value of variable and a function which returns the changed value. eg: `let [name, setName]=useState(props.name)` , `setName('gupta');`
+- useState hook -> `useState(<initializingvalue>)` ->this hook returns array containing 2 value, value of variable and a function which returns the changed value. eg: `let [name, setName]=useState(props.name)` , `setName('gupta');`
 
-    - to use useState for multiple, `const [fullProductInput, setfullProductInput]= useState({ title:'', date:'' });` , `function setfullProductInput(){  }`
+- to use useState for multiple, `const [fullProductInput, setfullProductInput]= useState({ title:'', date:'' });` , `function setfullProductInput(){  }`
 
 # State Lifting (Child contacting parent)->
-    - create a function and pass it to the child and child will return the obj as argument. eg:
-        in app.js
-        ```javascript
+- create a function and pass it to the child and child will return the obj as argument. eg:
+    - in app.js
+     ```javascript
          function tryingchild(data){
             console.log('inside app.js');
             console.log(data);
          }
          <NewProduct contacting={tryingchild} />
         ```
-        in NewProduct.js
+    - in NewProduct.js
         ```javascript
         function grandchild(data){
              console.log('inside newproduct.js');
@@ -46,7 +46,7 @@
         }
         <ProductForm finall={grandchild} />
         ```
-        in ProductForm.js
+    - in ProductForm.js
         ```javascript
         const data={
             name:newName,
@@ -60,32 +60,33 @@
 - `<input type='text' value={newName}>` -> value tag links the newName to the value of input.
 - Whenever using map to list elements always use key tag. eg: `key={data.id}` 
 
-- useEffect hook -> it manages side effects like making an api call, change in the document title, modifying browsers history etc. [agar aap koi task karwana chahte ho component ke render hone ke baad, uss task ko hm iss hook ke andr define karte hain aur usko hi side effects kehte hain]. contains 2 parts, callback function and array of dependencies.
+# useEffect hook 
+- it manages side effects like making an api call, change in the document title, modifying browsers history etc. [agar aap koi task karwana chahte ho component ke render hone ke baad, uss task ko hm iss hook ke andr define karte hain aur usko hi side effects kehte hain]. contains 2 parts, callback function and array of dependencies.
     - var1(every render): it executes after every rendering. eg: `useEffect(()=>{ console.log( 'UI rendering done' )});`
     - var2(first render): only after first rendering. eg: `useEffect(()=>{ console.log( 'UI rendering done' )}, []);`
     - var3(whenever dependency changes + first render): eg: `useEffect(()=>{ console.log( 'UI rendering done' )}, [text]);`
     - var4(first remove listener then add listener): eg: `useEffect(()=>{ console.log('listener added') return ()=>{ console.log('listener removed) }}, [text]);`
 
-- React Toast: 
-    - `npm i react-toastify` ->to install
-    - in index.js file:
-    -  `import { ToastContainer } from 'react-toastify';`
-    -  `import "react-toastify/dist/ReactToastify.css";`
-        ```javascript
-        <div>
-        <App />
-        <ToastContainer/>
-        </div>
-        ```
-    - Where you have to use: `import { toast } from "react-toastify";`, 
-    - use like these:  
+# React Toast: 
+- `npm i react-toastify` ->to install
+- in index.js file:
+-  `import { ToastContainer } from 'react-toastify';`
+-  `import "react-toastify/dist/ReactToastify.css";`
+    ```javascript
+    <div>
+    <App />
+    <ToastContainer/>
+    </div>
+    ```
+- Where you have to use: `import { toast } from "react-toastify";`, 
+- use like these:  
         `toast.warning('Like Removed');`
         `toast.success('Liked Successfully');`
         `toast.error('something went wrong');`
 
-    - `npm i react-hot-toast`
-    - in index.js file: `import { Toaster } from 'react-hot-toast';`, ` <App /> <Toaster/>`
-    - where you have to use: - `import toast from "react-hot-toast";`
+- `npm i react-hot-toast`
+- in index.js file: `import { Toaster } from 'react-hot-toast';`, ` <App /> <Toaster/>`
+- where you have to use: - `import toast from "react-hot-toast";`
 
 
 
