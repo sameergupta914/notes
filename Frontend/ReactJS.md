@@ -30,7 +30,7 @@
 
 # State Lifting (Child contacting parent)->
 - create a function and pass it to the child and child will return the obj as argument. eg:
-    - in app.js
+- in app.js
      ```javascript
          function tryingchild(data){
             console.log('inside app.js');
@@ -38,7 +38,7 @@
          }
          <NewProduct contacting={tryingchild} />
         ```
-    - in NewProduct.js
+- in NewProduct.js
         ```javascript
         function grandchild(data){
              console.log('inside newproduct.js');
@@ -46,7 +46,7 @@
         }
         <ProductForm finall={grandchild} />
         ```
-    - in ProductForm.js
+- in ProductForm.js
         ```javascript
         const data={
             name:newName,
