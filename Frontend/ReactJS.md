@@ -23,12 +23,12 @@
 - onClick -> this hook take function as input. eg: `<button className='btn' onClick={clickHandler}>` , `function clickHandler(){ console.log('trying onclick hook'); }`
 - onChange -> comes in action as soon as there is any change in the input.
 
-- Prop Drilling (Parent contacting child)->
+# Prop Drilling (Parent contacting child), useState hook
     - useState hook -> `useState(<initializingvalue>)` ->this hook returns array containing 2 value, value of variable and a function which returns the changed value. eg: `let [name, setName]=useState(props.name)` , `setName('gupta');`
 
     - to use useState for multiple, `const [fullProductInput, setfullProductInput]= useState({ title:'', date:'' });` , `function setfullProductInput(){  }`
 
-- State Lifting (Child contacting parent)->
+# State Lifting (Child contacting parent)->
     - create a function and pass it to the child and child will return the obj as argument. eg:
         in app.js
         ```javascript
