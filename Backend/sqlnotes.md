@@ -1,0 +1,677 @@
+# SQL Interview & OA Master Notes (Cheat Sheet)
+
+1) Core Concepts
+Relational model: tables (relations), rows (tuples), columns (attributes).
+
+Keys:
+
+PK (Primary Key): unique + not null.
+
+UK (Unique Key): unique, can be null (vendor rules differ).
+
+FK (Foreign Key): references PK/UK; maintains referential integrity.
+
+Integrity constraints: NOT NULL, CHECK, DEFAULT, FK actions (CASCADE/RESTRICT/SET NULL/SET DEFAULT).
+
+Normalization:
+
+1NF: atomic columns (no arrays/lists).
+
+2NF: 1NF + no partial dependency on a composite key.
+
+3NF: 2NF + no transitive dependency (non-key → non-key).
+
+BCNF: every determinant is a candidate key.
+
+Normalize for integrity; denormalize for read performance (with care).
+
+2) SQL Families
+DDL: CREATE | ALTER | DROP | TRUNCATE
+
+DML: INSERT | UPDATE | DELETE | MERGE
+
+DQL: SELECT
+
+DCL/TCL: GRANT/REVOKE and COMMIT/ROLLBACK/SAVEPOINT/SET TRANSACTION
+
+3) SELECT Anatomy (Execution Order Mental Model)
+FROM → JOIN → WHERE → GROUP BY → HAVING → WINDOW → SELECT → DISTINCT → ORDER BY → LIMIT/OFFSET
+
+WHERE vs HAVING: WHERE filters rows before aggregation; HAVING filters groups after aggregation.
+
+4) JOINs — types, correctness, and traps
+4.1 Inner vs Outer joins
+Inner JOIN → keep only matching rows.
+
+sql
+Copy
+Edit
+SELECT c.customer_id, c.name, o.order_id, o.amount
+FROM Customers c
+JOIN Orders o
+  ON o.customer_id = c.customer_id;
+Left JOIN → keep all left rows; fill NULL for missing right.
+
+sql
+Copy
+Edit
+-- "customers with their last order amount (if any)"
+SELECT c.customer_id, c.name, o.amount
+FROM Customers c
+LEFT JOIN Orders o
+  ON o.customer_id = c.customer_id
+ AND o.order_date = (SELECT MAX(order_date)
+                     FROM Orders
+                     WHERE customer_id = c.customer_id);
+Right JOIN is symmetric (rare in practice).
+Full OUTER JOIN keeps non-matching from both sides (not in MySQL; emulate with UNION ALL + anti-joins).
+
+Key pitfall: When aggregating with LEFT JOIN, join multiplicity inflates counts:
+
+sql
+Copy
+Edit
+-- Count orders per customer (correct)
+SELECT c.customer_id,
+       COUNT(o.order_id) AS order_cnt
+FROM Customers c
+LEFT JOIN Orders o
+  ON o.customer_id = c.customer_id
+GROUP BY c.customer_id;
+
+-- Be careful: COUNT(*) counts rows even if order_id is NULL
+-- Use COUNT(o.order_id) to count only matched orders.
+4.2 CROSS join (Cartesian)
+sql
+Copy
+Edit
+SELECT c.name, d.date
+FROM Customers c
+CROSS JOIN (SELECT DATE '2025-08-01' AS date
+            UNION ALL SELECT DATE '2025-08-02') d;
+Use for generating combinations/calendars—but know it multiplies row counts.
+
+4.3 SELF join
+sql
+Copy
+Edit
+-- Employees(manager_id) example: get employee with their manager's name
+SELECT e.name  AS employee,
+       m.name  AS manager
+FROM Employees e
+LEFT JOIN Employees m
+  ON m.id = e.manager_id;
+4.4 SEMI / ANTI joins (EXISTS / NOT EXISTS)
+Semi-join: keep customers who have at least one order.
+
+sql
+Copy
+Edit
+SELECT c.*
+FROM Customers c
+WHERE EXISTS (
+  SELECT 1 FROM Orders o
+  WHERE o.customer_id = c.customer_id
+);
+Anti-join: customers with no orders (safe with NULLs):
+
+sql
+Copy
+Edit
+SELECT c.*
+FROM Customers c
+WHERE NOT EXISTS (
+  SELECT 1 FROM Orders o
+  WHERE o.customer_id = c.customer_id
+);
+Interview trap: WHERE customer_id NOT IN (SELECT customer_id FROM Orders) fails if the subquery yields NULL. Prefer NOT EXISTS.
+
+4.5 ON vs WHERE with OUTER joins
+Filters that go in ON vs WHERE change results:
+
+sql
+Copy
+Edit
+-- Keep all customers; only sum completed orders (status='completed')
+SELECT c.customer_id, SUM(o.amount) AS amt
+FROM Customers c
+LEFT JOIN Orders o
+  ON o.customer_id = c.customer_id
+ AND o.status = 'completed'        -- filter in ON retains customers with zero completed orders
+GROUP BY c.customer_id;
+
+-- If you put AND o.status='completed' in WHERE, it turns LEFT into INNER (drops customers with 0 completed)
+5) Subqueries & CTEs — when, why, and faster patterns
+5.1 Scalar, derived, correlated
+Scalar subquery (single value):
+
+sql
+Copy
+Edit
+-- Compare an order against customer's avg order amount
+SELECT o.order_id, o.amount,
+       (SELECT AVG(amount) FROM Orders oo
+        WHERE oo.customer_id = o.customer_id) AS avg_for_customer
+FROM Orders o;
+Derived table (subquery in FROM):
+
+sql
+Copy
+Edit
+SELECT c.customer_id, x.first_date, x.last_date
+FROM Customers c
+JOIN (
+  SELECT customer_id,
+         MIN(order_date) AS first_date,
+         MAX(order_date) AS last_date
+  FROM Orders
+  GROUP BY customer_id
+) x ON x.customer_id = c.customer_id;
+Correlated subquery (runs per row):
+
+sql
+Copy
+Edit
+-- Latest order per customer (correlated)
+SELECT c.customer_id,
+       (SELECT MAX(order_date)
+        FROM Orders o
+        WHERE o.customer_id = c.customer_id) AS last_order
+FROM Customers c;
+Performance hint: Many correlated subqueries can be rewritten as JOIN + GROUP BY for set-based execution (often faster).
+
+5.2 CTEs (WITH) — readability, reuse, recursion
+Non-recursive CTE:
+
+sql
+Copy
+Edit
+WITH customer_totals AS (
+  SELECT customer_id, SUM(amount) AS total_amt
+  FROM Orders
+  GROUP BY customer_id
+)
+SELECT c.name, t.total_amt
+FROM Customers c
+LEFT JOIN customer_totals t
+  ON t.customer_id = c.customer_id
+ORDER BY t.total_amt DESC NULLS LAST;
+Recursive CTE (hierarchies—org chart):
+
+sql
+Copy
+Edit
+WITH RECURSIVE org AS (
+  SELECT id, manager_id, name, 0 AS lvl
+  FROM Employees
+  WHERE id = :root_id
+  UNION ALL
+  SELECT e.id, e.manager_id, e.name, o.lvl + 1
+  FROM Employees e
+  JOIN org o ON e.manager_id = o.id
+)
+SELECT * FROM org ORDER BY lvl, name;
+When to choose CTE vs subquery vs temp table
+
+CTE → readability, one-pass logic, recursion.
+
+Derived subquery → quick inline transform.
+
+Temp table → reuse across multiple statements, indexing/intermediate materialization.
+
+Vendor note: Some engines may inline (optimize away) CTEs; others may materialize. Be aware when chasing performance.
+
+6) Aggregation & GROUP BY — correctness, advanced grouping
+6.1 WHERE vs HAVING
+sql
+Copy
+Edit
+-- Only orders from 2025, then group by customer
+SELECT customer_id, SUM(amount)
+FROM Orders
+WHERE order_date >= '2025-01-01'           -- filters rows BEFORE grouping
+GROUP BY customer_id
+HAVING SUM(amount) > 1000;                 -- filters groups AFTER aggregation
+6.2 Conditional aggregation (very interview-friendly)
+sql
+Copy
+Edit
+SELECT c.city,
+       SUM(CASE WHEN o.amount >= 100 THEN 1 ELSE 0 END) AS big_orders,
+       SUM(o.amount) AS total_amount
+FROM Customers c
+LEFT JOIN Orders o ON o.customer_id = c.customer_id
+GROUP BY c.city;
+6.3 DISTINCT in aggregates
+sql
+Copy
+Edit
+SELECT customer_id,
+       COUNT(DISTINCT order_date) AS active_days
+FROM Orders
+GROUP BY customer_id;
+6.4 Groupwise maximum (get the row with max per group)
+Two ways:
+
+A) JOIN on max:
+
+sql
+Copy
+Edit
+-- Last order row per customer
+WITH last_dates AS (
+  SELECT customer_id, MAX(order_date) AS last_dt
+  FROM Orders
+  GROUP BY customer_id
+)
+SELECT o.*
+FROM Orders o
+JOIN last_dates d
+  ON d.customer_id = o.customer_id
+ AND d.last_dt = o.order_date;
+B) Window function + filter (simpler):
+
+sql
+Copy
+Edit
+SELECT *
+FROM (
+  SELECT o.*,
+         ROW_NUMBER() OVER (PARTITION BY customer_id
+                            ORDER BY order_date DESC, order_id DESC) AS rn
+  FROM Orders o
+) x
+WHERE rn = 1;
+6.5 GROUPING SETS / ROLLUP / CUBE (multi-level totals)
+sql
+Copy
+Edit
+-- City, customer totals, and grand total in one pass (Postgres/SQL Server/Oracle)
+SELECT c.city, o.customer_id, SUM(o.amount) AS total_amount,
+       GROUPING(c.city)    AS g_city,
+       GROUPING(o.customer_id) AS g_cust
+FROM Customers c
+JOIN Orders o ON o.customer_id = c.customer_id
+GROUP BY ROLLUP (c.city, o.customer_id);
+Interpret rows with GROUPING() flags to identify subtotal/grand total rows.
+
+6.6 Functional dependency & ONLY_FULL_GROUP_BY
+Some engines (MySQL with ONLY_FULL_GROUP_BY off) allow selecting non-grouped columns if “functionally dependent.” For interviews, stick to portable: every non-aggregated selected column must appear in GROUP BY.
+
+7) Window Functions — frames, ordering, and real use-cases
+7.1 Mental model
+PARTITION BY defines groups (keeps all rows).
+
+ORDER BY defines sequence inside group.
+
+Frame defines how many rows are included in the calculation relative to current row.
+
+Default frames differ by DB. To avoid surprises, be explicit.
+
+7.2 Running total, moving average
+sql
+Copy
+Edit
+-- Running total by customer, ordered by date
+SELECT o.customer_id, o.order_date, o.amount,
+       SUM(o.amount) OVER (
+         PARTITION BY o.customer_id
+         ORDER BY o.order_date
+         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+       ) AS running_total
+FROM Orders o;
+sql
+Copy
+Edit
+-- 7-day moving average (requires dense daily rows per customer or a date spine)
+SELECT customer_id, order_date, amount,
+       AVG(amount) OVER (
+         PARTITION BY customer_id
+         ORDER BY order_date
+         ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+       ) AS ma_7
+FROM Orders;
+ROWS vs RANGE:
+
+ROWS counts row positions (deterministic).
+
+RANGE groups by value range; with duplicates it may expand unexpectedly. Prefer ROWS for precise rolling windows.
+
+7.3 Ranking and ties
+sql
+Copy
+Edit
+SELECT customer_id, amount,
+       ROW_NUMBER()  OVER (PARTITION BY customer_id ORDER BY amount DESC) AS rn,
+       RANK()        OVER (PARTITION BY customer_id ORDER BY amount DESC) AS rnk,
+       DENSE_RANK()  OVER (PARTITION BY customer_id ORDER BY amount DESC) AS drnk
+FROM Orders;
+ROW_NUMBER: 1,2,3,4 (no ties).
+
+RANK: 1,1,3 (skips after ties).
+
+DENSE_RANK: 1,1,2 (no gaps).
+
+Top-N per group:
+
+sql
+Copy
+Edit
+SELECT *
+FROM (
+  SELECT o.*,
+         ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY amount DESC) AS rn
+  FROM Orders o
+) x
+WHERE rn <= 3;
+7.4 LAG/LEAD (deltas, churn)
+sql
+Copy
+Edit
+SELECT customer_id, order_date, amount,
+       LAG(amount)  OVER (PARTITION BY customer_id ORDER BY order_date) AS prev_amt,
+       amount - LAG(amount) OVER (PARTITION BY customer_id ORDER BY order_date) AS delta
+FROM Orders;
+7.5 Percentiles and distribution
+(availability varies)
+
+sql
+Copy
+Edit
+-- Continuous percentile (Postgres/SQL Server)
+SELECT
+  PERCENTILE_CONT(0.9) WITHIN GROUP (ORDER BY amount) OVER (PARTITION BY customer_id) AS p90
+FROM Orders;
+7.6 Conditional windows (filter inside window)
+Most engines don’t support COUNT(DISTINCT ...) OVER easily. Common tricks:
+
+sql
+Copy
+Edit
+-- Count of distinct order_date per customer using "change detection" trick
+SELECT customer_id, order_date,
+       SUM(is_new_day) OVER (PARTITION BY customer_id ORDER BY order_date
+                             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS distinct_days_so_far
+FROM (
+  SELECT o.*,
+         CASE WHEN order_date
+                <> LAG(order_date) OVER (PARTITION BY customer_id ORDER BY order_date)
+              THEN 1 ELSE 0 END AS is_new_day
+  FROM Orders o
+) t;
+7.7 Frame pitfalls to know
+Without explicit frame, some DBs default to RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW (not the same as ROWS).
+
+ORDER BY with duplicates + RANGE ⇒ can include all peers with the same ordering value. Use ROWS to avoid surprises.
+
+8) NULLs & Three-Valued Logic
+Comparisons with NULL → UNKNOWN (not true/false). Use IS NULL / IS NOT NULL.
+
+COUNT(*) counts rows; COUNT(col) ignores NULLs.
+
+COALESCE(a,b,…) returns first non-null.
+
+Pitfall: NOT IN (subquery) returns empty set if subquery returns any NULL. Prefer NOT EXISTS.
+
+9) Set Operations
+UNION (distinct), UNION ALL (keeps duplicates), INTERSECT, EXCEPT/MINUS.
+
+Columns count & types must align.
+
+10) Indexing (high-leverage topic)
+B-tree (default): good for equality and range.
+
+Hash (Postgres hash): equality only.
+
+Bitmap (DW/Oracle): low-cardinality, read-mostly.
+
+GiST/GIN (Postgres): full-text, arrays, JSON, geo.
+
+Clustered (SQL Server/InnoDB PK): physical order matches index key.
+
+Composite index order matters: put most selective/most commonly filtered first (but consider sort/order patterns!).
+
+Covering index: includes all needed columns for a query (data fetched from index only).
+
+SARGable predicates: avoid functions on indexed columns in WHERE; rewrite to keep column “as is”.
+
+sql
+Copy
+Edit
+-- Bad (non-sargable)
+WHERE DATE(order_ts) = '2025-08-01'
+-- Good
+WHERE order_ts >= '2025-08-01' AND order_ts < '2025-08-02'
+Partial/Filtered indexes: index a subset of rows (Postgres/SQL Server).
+
+11) Query Performance & Plans
+Know join algorithms: Nested Loops, Hash Join, Merge Join.
+
+Read plans: scan type (seq/index), join order, estimated rows, filter predicates, costs.
+
+Stats matter: outdated stats → bad plans. Keep autovacuum/auto-stats on or update stats.
+
+Use EXPLAIN (ANALYZE) (Postgres), EXPLAIN (MySQL), SET STATISTICS IO/TIME (SQL Server).
+
+12) Transactions, Isolation & Concurrency
+ACID: Atomicity, Consistency, Isolation, Durability.
+
+Isolation levels (lowest → highest):
+
+Read Uncommitted → Read Committed → Repeatable Read → Serializable.
+
+Anomalies: dirty read, non-repeatable read, phantom read.
+
+MVCC (Postgres/MySQL InnoDB): snapshot reads, writers don’t block readers (mostly).
+
+Deadlocks: cyclic waits; keep transactions short, consistent ordering, proper indexes; handle 1205/40P01 by retry.
+
+13) Modifications & Upserts
+INSERT: single/multi-row; INSERT…SELECT.
+
+UPSERT:
+
+Postgres: INSERT ... ON CONFLICT (key) DO UPDATE ... RETURNING *;
+
+MySQL: INSERT ... ON DUPLICATE KEY UPDATE ...;
+
+SQL Server/Oracle: MERGE (use carefully).
+
+UPDATE with JOIN:
+
+sql
+Copy
+Edit
+-- Postgres
+UPDATE t
+SET col = s.new_val
+FROM staging s
+WHERE s.id = t.id;
+DELETE using CTE (and keep one per group):
+
+sql
+Copy
+Edit
+WITH d AS (
+  SELECT id,
+         ROW_NUMBER() OVER (PARTITION BY email ORDER BY created_at DESC) AS rn
+  FROM users
+)
+DELETE FROM users
+USING d
+WHERE users.id = d.id AND d.rn > 1;
+14) Views, Materialized Views, Functions, Triggers
+Views: saved SELECT; always reads base tables.
+
+Materialized Views: persisted results; refresh needed; great for heavy aggregates.
+
+Stored procedures/functions: procedural logic; beware portability.
+
+Triggers: BEFORE/AFTER INSERT/UPDATE/DELETE; use judiciously (hidden work, can hamper bulk loads).
+
+15) Security & Safety
+Roles, privileges, GRANT/REVOKE, least privilege.
+
+SQL injection: always parameterize queries; never string-concatenate user input.
+
+Row-Level Security (Postgres), Always Encrypted (SQL Server), masked columns.
+
+16) Dates/Times & Time Zones
+Use proper types: DATE, TIMESTAMP [WITH TIME ZONE].
+
+Store UTC; convert at edges.
+
+Range filters for days: [inclusive, exclusive) pattern (see sargability example above).
+
+Extract/trunc functions: DATE_TRUNC('month', ts) (PG), DATE_FORMAT (MySQL), DATENAME/DATEPART (T-SQL).
+
+17) Strings, Patterns, Full-Text
+Case-insensitive search: Postgres ILIKE, MySQL collations, SQL Server COLLATE.
+
+Wildcards: % (many), _ (single). Leading % prevents index use.
+
+Regex: PG ~, SQL Server LIKE (limited), MySQL REGEXP.
+
+Full-text: to_tsvector/to_tsquery (PG), MATCH…AGAINST (MySQL InnoDB FTS), SQL Server FTS.
+
+18) JSON / Semi-Structured
+Postgres JSONB: ->, ->>, @>, GIN index on jsonb_path_ops.
+
+MySQL JSON: JSON_EXTRACT, ->>, virtual/generated columns + index.
+
+SQL Server: JSON_VALUE, OPENJSON.
+
+sql
+Copy
+Edit
+-- Postgres: index a JSONB property
+CREATE INDEX idx_user_meta_city ON users USING GIN ((meta->>'city'));
+19) Partitions & Large Tables
+Partitioning: range/list/hash; prunes scans; helps maintenance.
+
+Beware global vs local indexes (Oracle) and constraint routing (PG).
+
+Use bulk operations (COPY/bcp/BULK INSERT) for large loads.
+
+20) Common Interview Patterns (with templates)
+A) Nth highest salary
+sql
+Copy
+Edit
+-- Dense ranks (keep ties)
+SELECT salary
+FROM (
+  SELECT salary,
+         DENSE_RANK() OVER (ORDER BY salary DESC) AS r
+  FROM emp
+) t
+WHERE r = :n;
+B) Top N per group (e.g., top 3 products per category)
+sql
+Copy
+Edit
+SELECT *
+FROM (
+  SELECT p.*,
+         ROW_NUMBER() OVER (PARTITION BY category ORDER BY sales DESC) AS rn
+  FROM products p
+) x
+WHERE rn <= 3;
+C) Running total & moving average
+sql
+Copy
+Edit
+SELECT d,
+       amt,
+       SUM(amt) OVER (ORDER BY d
+         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS run_total,
+       AVG(amt) OVER (ORDER BY d
+         ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS ma_7
+FROM t;
+D) Gaps & Islands (consecutive sequences)
+sql
+Copy
+Edit
+-- Number islands of consecutive days per id
+WITH x AS (
+  SELECT id, d,
+         d - INTERVAL '1 day' * ROW_NUMBER() OVER (PARTITION BY id ORDER BY d) AS grp
+  FROM t
+)
+SELECT id, MIN(d) AS start_d, MAX(d) AS end_d
+FROM x
+GROUP BY id, grp;
+E) Relational division (find customers who bought all products in a set)
+sql
+Copy
+Edit
+SELECT c.customer_id
+FROM purchases p
+JOIN customers c ON c.customer_id = p.customer_id
+WHERE p.product_id IN (101,102,103)
+GROUP BY c.customer_id
+HAVING COUNT(DISTINCT p.product_id) = 3;
+F) De-duplicate keep latest
+sql
+Copy
+Edit
+DELETE FROM users u
+USING (
+  SELECT id, ROW_NUMBER() OVER (PARTITION BY email ORDER BY created_at DESC) rn
+  FROM users
+) x
+WHERE u.id = x.id AND x.rn > 1;
+G) Pagination (stable)
+sql
+Copy
+Edit
+-- Stable keyset pagination (better than OFFSET for large pages)
+SELECT *
+FROM posts
+WHERE (created_at, id) < (:last_created_at, :last_id)
+ORDER BY created_at DESC, id DESC
+LIMIT 20;
+21) Vendor Syntax Quickies
+Limit/Top:
+
+Postgres/MySQL: LIMIT n OFFSET m
+
+SQL Server: OFFSET m ROWS FETCH NEXT n ROWS ONLY or SELECT TOP n ...
+
+UPSERT: PG ON CONFLICT, MySQL ON DUPLICATE KEY UPDATE, SQL Server MERGE.
+
+Boolean: PG boolean; MySQL uses TINYINT(1); SQL Server BIT.
+
+Identifiers: quoted vs backticked; case sensitivity differs.
+
+Default window frame: varies—be explicit.
+
+22) Best Practices (Interview Soundbites)
+Write sargable predicates; avoid functions on indexed columns.
+
+Prefer EXISTS/NOT EXISTS over IN/NOT IN with potential NULLs.
+
+Use the right index: composite with correct column order; add include columns (SQL Server) / covering indexes.
+
+Keep transactions small and consistent; handle deadlock retries.
+
+Validate data types, collations, and time zones early.
+
+Use parameterized queries to prevent SQL injection.
+
+Add constraints to enforce business rules; don’t rely solely on app code.
+
+For analytics, prefer window functions over correlated subqueries.
+
+23) OA/Interview Tips
+Start with a clear query shape (FROM/JOIN → WHERE → GROUP → WINDOW → SELECT…).
+
+Check NULL behavior and edge cases (empty groups, ties).
+
+Keep solutions portable, but mention vendor-specific optimizations if asked.
+
+If performance is discussed, talk indexes, plans, sargability, and cardinality.
+
+For long problems, build with CTEs step-by-step (easier to debug).
+
+Show you know trade-offs: normalization vs denormalization, MVCC vs locks, heap vs clustered.
