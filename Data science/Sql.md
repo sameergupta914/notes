@@ -131,22 +131,25 @@
 - Scalar, derived, correlated
   Scalar subquery (single value):
 
-  -- Compare an order against customer's avg order amount
-  SELECT o.order_id, o.amount,
-        (SELECT AVG(amount) FROM Orders oo
-          WHERE oo.customer_id = o.customer_id) AS avg_for_customer
-  FROM Orders o;
-  Derived table (subquery in FROM):
+  - eg: Compare an order against customer's avg order amount
+  
+      SELECT o.order_id, o.amount,
+            (SELECT AVG(amount) FROM Orders oo
+              WHERE oo.customer_id = o.customer_id) AS avg_for_customer
+      FROM Orders o;
+      Derived table (subquery in FROM):
 
-  SELECT c.customer_id, x.first_date, x.last_date
-  FROM Customers c
-  JOIN (
-    SELECT customer_id,
-          MIN(order_date) AS first_date,
-          MAX(order_date) AS last_date
-    FROM Orders
-    GROUP BY customer_id
-  ) x ON x.customer_id = c.customer_id;
+      SELECT c.customer_id, x.first_date, x.last_date
+      FROM Customers c
+      JOIN (
+        SELECT customer_id,
+              MIN(order_date) AS first_date,
+              MAX(order_date) AS last_date
+        FROM Orders
+        GROUP BY customer_id
+      ) x ON x.customer_id = c.customer_id;
+
+
   Correlated subquery (runs per row):
 
 
@@ -158,40 +161,82 @@
   FROM Customers c;
   Performance hint: Many correlated subqueries can be rewritten as JOIN + GROUP BY for set-based execution (often faster).
 
-- CTEs (WITH) — readability, reuse, recursion
-  Non-recursive CTE:
+# Recursive CTE
 
-  WITH customer_totals AS (
-    SELECT customer_id, SUM(amount) AS total_amt
-    FROM Orders
-    GROUP BY customer_id
-  )
-  SELECT c.name, t.total_amt
-  FROM Customers c
-  LEFT JOIN customer_totals t
-    ON t.customer_id = c.customer_id
-  ORDER BY t.total_amt DESC NULLS LAST;
-  Recursive CTE (hierarchies—org chart):
+- A CTE (“common table expression”) is a temporary result set named in a WITH clause.
+- A recursive CTE is a CTE that refers to itself so it can repeatedly build rows—perfect for hierarchies, paths, and sequences.
 
-  WITH RECURSIVE org AS (
-    SELECT id, manager_id, name, 0 AS lvl
-    FROM Employees
-    WHERE id = :root_id
-    UNION ALL
-    SELECT e.id, e.manager_id, e.name, o.lvl + 1
-    FROM Employees e
-    JOIN org o ON e.manager_id = o.id
-  )
-  SELECT * FROM org ORDER BY lvl, name;
-  When to choose CTE vs subquery vs temp table
+- It has two parts:
+  - Anchor (base) member – seeds the first rows
+  - Recursive member – reads the CTE and adds the “next” rows
+- They’re combined with UNION ALL and stop when the recursive SELECT returns no new rows (or when a configured depth limit is hit).
 
-  CTE → readability, one-pass logic, recursion.
+- MySQL rules (key points)
 
-  Derived subquery → quick inline transform.
+  - Use WITH RECURSIVE name AS ( anchor UNION ALL recursive ).
+  - Both SELECTs must return the same columns and compatible types (use CAST if needed).
+  - Default depth limit is 1000; change with SET SESSION cte_max_recursion_depth = 5000;.
+- Eg:
 
-  Temp table → reuse across multiple statements, indexing/intermediate materialization.
+    - Generate a simple sequence (1…10)
+      - WITH RECURSIVE seq(n) AS (
+          SELECT 1            -- anchor
+          UNION ALL
+          SELECT n + 1        -- recursive step
+          FROM seq
+          WHERE n < 10        -- termination condition
+        )
+        SELECT n FROM seq;
 
-  Vendor note: Some engines may inline (optimize away) CTEs; others may materialize. Be aware when chasing performance.
+
+        Idea: Start at 1, keep adding 1 while n < 10.
+
+    - Build a date series (from A to B)
+       - WITH RECURSIVE d(dt) AS (
+            SELECT DATE('2025-08-01')       -- start date
+            UNION ALL
+            SELECT dt + INTERVAL 1 DAY
+            FROM d
+            WHERE dt < '2025-08-10'         -- stop condition
+          )
+          SELECT dt FROM d;
+
+
+    Handy for left-joining against missing dates in reports.
+
+    - Traverse a hierarchy (employees → reports)
+
+         - Assume employees(id, manager_id, name) where the CEO’s manager_id is NULL.
+
+          WITH RECURSIVE org AS (
+            -- Anchor: start at the CEO (or any root)
+            SELECT 
+              id,
+              manager_id,
+              name,
+              0         AS lvl,
+              CAST(id AS CHAR(200)) AS path_ids   -- track path to guard against cycles
+            FROM employees
+            WHERE manager_id IS NULL
+
+            UNION ALL
+
+            -- Recursive: get direct reports of previous level
+            SELECT 
+              e.id,
+              e.manager_id,
+              e.name,
+              o.lvl + 1 AS lvl,
+              CONCAT(o.path_ids, ',', e.id) AS path_ids
+            FROM employees e
+            JOIN org o ON e.manager_id = o.id
+            -- optional cycle guard (useful if data can be dirty):
+            WHERE FIND_IN_SET(e.id, o.path_ids) = 0
+          )
+          SELECT id, manager_id, name, lvl
+          FROM org
+          ORDER BY lvl, id;   -- breadth-ish order
+
 
 # Aggregation & GROUP BY — correctness, advanced grouping
 
