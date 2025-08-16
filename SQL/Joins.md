@@ -9,9 +9,9 @@
 - Cross joins are not commonly used in practice, but they can be useful in certain scenarios, such as generating test data or exploring all possible combinations of items in a product catalogue. However, it's important to be cautious when using cross joins with large tables, as they can generate a very large result set, which can be resource-intensive and slow to process.
 - Syntax:
 
-    SELECT a.column1, b.column2
-    FROM tableA a
-    CROSS JOIN tableB b;
+            SELECT a.column1, b.column2
+            FROM tableA a
+            CROSS JOIN tableB b;
 
 
 # Inner Join
@@ -21,10 +21,10 @@
 
 - syntax:
 
-    SELECT a.column1, b.column2
-    FROM tableA a
-    INNER JOIN tableB b
-    ON a.common_column = b.common_column;
+            SELECT a.column1, b.column2
+            FROM tableA a
+            INNER JOIN tableB b
+            ON a.common_column = b.common_column;
 
 
 # Left Join
@@ -33,10 +33,10 @@
 - In other words, a left join combines the rows from both tables based on a common column, but it also includes all the rows from the left table, even if there are no matches in the right table. This is useful when you want to include all the records from the first table, but only some records from the second table.
 - Syntax:
 
-    SELECT a.column1, b.column2
-    FROM tableA a
-    LEFT JOIN tableB b
-    ON a.common_column = b.common_column;
+            SELECT a.column1, b.column2
+            FROM tableA a
+            LEFT JOIN tableB b
+            ON a.common_column = b.common_column;
 
 
 # Right Join
@@ -44,10 +44,10 @@
 - A right join, also known as a right outer join, is a type of join operation in SQL that returns all the rows from the right table and matching rows from the left table. If there are no matches in the left table, the result will still contain all the rows from the right table, with NULL values for the columns from the left table.
 - Syntax:
 
-    SELECT a.column1, b.column2
-    FROM tableA a
-    RIGHT JOIN tableB b
-    ON a.common_column = b.common_column;
+            SELECT a.column1, b.column2
+            FROM tableA a
+            RIGHT JOIN tableB b
+            ON a.common_column = b.common_column;
 
 
 
@@ -56,13 +56,13 @@
 - A full outer join, sometimes called a full join, is a type of join operation in SQL that returns all matching rows from both the left and right tables, as well as any non-matching rows from either table. In other words, a full outer join returns all the rows from both tables and matches rows with common values in the specified columns, and fills in NULL values for columns where there is no match.
 - Syntax:
 
-    SELECT a.column1, b.column2
-    FROM tableA a
-    LEFT JOIN tableB b ON a.common_column = b.common_column
-    UNION
-    SELECT a.column1, b.column2
-    FROM tableA a
-    RIGHT JOIN tableB b ON a.common_column = b.common_column;
+            SELECT a.column1, b.column2
+            FROM tableA a
+            LEFT JOIN tableB b ON a.common_column = b.common_column
+            UNION
+            SELECT a.column1, b.column2
+            FROM tableA a
+            RIGHT JOIN tableB b ON a.common_column = b.common_column;
 
 # Sql Set Operations
 
@@ -80,15 +80,15 @@
 - Self joins are used when you want to compare the values of two different rows within the same table. For example, you might use a self join to compare the salaries of two employees who work in the same department, or to find all pairs of customers who have the same billing address.
 -Syntax:
 
-    SELECT a.column1, b.column2
-    FROM employees a
-    JOIN employees b
-    ON a.manager_id = b.employee_id;
+            SELECT a.column1, b.column2
+            FROM employees a
+            JOIN employees b
+            ON a.manager_id = b.employee_id;
 
 - Natural join: syntax:
-    SELECT *
-    FROM tableA
-    NATURAL JOIN tableB;
+            SELECT *
+            FROM tableA
+            NATURAL JOIN tableB;
 
 - Inner vs Outer joins:
 
