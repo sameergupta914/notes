@@ -1,0 +1,7 @@
+# Tool Node
+
+- The tool node is a pre-built node that acts as a bridge between your graph and external tools. Its job is to listen for tool calls made by the LLM and automatically route the request to the correct tool when it receives a tool call.
+
+- The tool node is a part of the workflow structure that is invoked when there is a requirement for tools in the process. It is responsible for executing specific functions or retrieving information based on the queries received from the chat node. When a query is made, if it requires a tool, the workflow transitions from the chat node to the tool node, where the necessary tool is called to perform the required action, such as fetching a stock price or performing a calculation. The output from the tool node is then sent back to the chat node, allowing the system to refine and present the answer to the user. This structure enables multi-step processes by allowing the output of one tool to inform the next step in the workflow.
+
+- Tool Condition- The tool condition is a pre-built conditional function in LangGraph that helps your graph decide whether the flow should go to the tool node or back to the LLM (Large Language Model) and to the end node. It determines the appropriate action based on the user's query, indicating whether to engage in chatting or to call a tool for execution. This conditional flow is essential for managing the interaction between the chatbot and the external tools effectively.
