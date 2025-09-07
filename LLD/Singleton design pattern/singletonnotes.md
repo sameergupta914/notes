@@ -10,6 +10,10 @@
 
 - In multi-threaded applications, care must be taken to ensure that the Singleton pattern is thread-safe. Without proper synchronization, multiple threads could potentially create multiple instances of the class. To prevent this, locking mechanisms can be used to ensure that only one thread can create the instance at a time.
 
+- To make a class thread-safe, you can use a locking mechanism to ensure that only one thread can access a critical section of code at a time. In the context of a singleton pattern, you can implement a method that checks if an instance already exists. If it doesn't, you lock the section of code where the instance is created, allowing only one thread to enter and create the instance. After the instance is created, you unlock the section so that other threads can access it.
+
+- A common approach is to use a mutex for locking. You can implement a double-check locking mechanism where you first check if the instance is null without locking, and if it is, you then lock the section and check again before creating the instance. This way, you avoid unnecessary locking when the instance already exists, improving performance.
+
 - Real-World Use Cases: The transcript mentions several practical use cases for the Singleton pattern:
 
     - Logging Systems: Since logging is often a shared resource, a Singleton ensures that all parts of an application log to the same instance.
