@@ -1,7 +1,5 @@
 # Model Context Protocol (MCP) - The Why
 
----
-
 ## 2. The Problem: Fragmentation and Context Assembly
 
 The accessibility of AI created a new problem known as **The Problem of Fragmentation** 

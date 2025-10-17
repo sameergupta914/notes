@@ -1,7 +1,5 @@
 # Model Context Protocol (MCP) Trilogy: Trailer Overview
 
----
-
 ## 3. The Automation Workflow (3 Phases)
 
 The process is managed by **Claude** (the main AI/Host application), connected to various tools via MCP.
