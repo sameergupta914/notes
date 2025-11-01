@@ -1,3 +1,5 @@
+# factory design principle
+
 # Simple factory design
 
 - The simple factory method is not a formal design pattern but rather a design principle. It involves a factory class that decides which concrete class to instantiate based on the type provided. Essentially, the simple factory creates objects without exposing the instantiation logic to the client.

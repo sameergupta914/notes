@@ -23,7 +23,7 @@
 
     - Example: In a Shape hierarchy (Circle, Square), if you add Triangle, you may need to modify draw() logic in base class.
 
-#Conclusion
+# Conclusion
 
 - Encapsulate what varies, Put changing logic into its own class or module.
 
